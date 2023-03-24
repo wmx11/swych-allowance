@@ -1,4 +1,4 @@
-import { Container, Divider, Paper, Text } from '@mantine/core';
+import { Button, Container, Divider, Paper, Text } from '@mantine/core';
 import {
   ConnectWallet,
   Web3Button,
@@ -13,8 +13,10 @@ import StepOne from 'public/images/1.png';
 import StepTwo from 'public/images/2.png';
 import StepThree from 'public/images/3.png';
 import StepFour from 'public/images/4.png';
+import SwychLogo from 'public/images/swych.png';
 import { useEffect, useState } from 'react';
 import erc20Abi from '../utils/erc20.abi.json';
+import { FaPlus } from 'react-icons/fa';
 
 export default function Home() {
   const [allowanceValue, setAllowanceValue] = useState(0);
@@ -49,6 +51,39 @@ export default function Home() {
       setBalanceValue(parseFloat(balance.displayValue));
     }
   }, [address, allowance, balance]);
+
+  const importToken = async () => {
+    if (typeof window === 'undefined') {
+      console.error('Window is not defined');
+      return;
+    }
+
+    if (typeof window.ethereum === 'undefined') {
+      console.error('Ethereum provider is not defined.');
+      return;
+    }
+
+    const ethereum = window.ethereum;
+
+    try {
+      await ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: '0x9334e37faD7c41Cd6C9565Bff3A97CE31CEE52a3',
+            symbol: 'SWYCH',
+            decimals: 18,
+          },
+        },
+      });
+    } catch (error) {
+      console.error(
+        'There has been an issue adding Swych to your wallet',
+        error
+      );
+    }
+  };
 
   return (
     <>
@@ -88,8 +123,19 @@ export default function Home() {
 
             <ConnectWallet
               accentColor="blue"
-              className="rounded-xl bg-blue-500 border-none"
+              className="rounded-xl bg-blue-500 border-none mb-4"
             />
+
+            <Button
+              fullWidth
+              onClick={importToken}
+              color="teal"
+              size="lg"
+              rightIcon={<FaPlus />}
+            >
+              <Image src={SwychLogo} width={17} alt="swych logo" />
+              <Text className="ml-2">Add Swych</Text>
+            </Button>
           </Paper>
 
           {address ? (
